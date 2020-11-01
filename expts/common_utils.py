@@ -28,10 +28,12 @@ def run_rigid_pairwise(gmmreg_exe, model, scene, f_config):
     if type(model) == type('abc'):
         model = np.loadtxt(model)
         scene = np.loadtxt(scene)
-    if model.shape[0] > 5000:
-        model = downsampled_subset(model, 5000)
-    if scene.shape[0] > 5000:
-        scene = downsampled_subset(scene, 5000)
+    # Rm downsample, the data is already downsampled
+    # Modified by Hongtao Wu on Nov 1, 2020
+    # if model.shape[0] > 5000:
+    #     model = downsampled_subset(model, 5000)
+    # if scene.shape[0] > 5000:
+    #     scene = downsampled_subset(scene, 5000)
     print(model.shape)
     print(scene.shape)
     np.savetxt(os.path.join(TMP_PATH, 'model.txt'), model)
