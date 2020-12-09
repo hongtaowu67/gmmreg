@@ -13,7 +13,7 @@ def main(ply_path, txt_dir):
     pc_np_array = np.asarray(pc.points)
 
     ply_file = ply_path.split('/')[-1]
-    pc_name = ply_file.split('.')[0]
+    pc_name = ply_file[:-4]
     txt_file = pc_name + ".txt"
     txt_path = os.path.join(txt_dir, txt_file)
 
@@ -21,8 +21,8 @@ def main(ply_path, txt_dir):
     print("Finish processing {}".format(pc_name))
 
 if __name__ == "__main__":
-    ply_dir = "../data/bunny/ply"
-    txt_dir = "../data/bunny/txt"
+    ply_dir = "../data/outlier_data/Gaussian_ply"
+    txt_dir = "../data/outlier_data/Gaussian_txt"
     file_list = os.listdir(ply_dir)
 
     for f in file_list:

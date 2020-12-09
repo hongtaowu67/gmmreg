@@ -81,29 +81,54 @@ if __name__ == "__main__":
     DATA_PATH = '../data/bunny/txt'
     CONFIG_FILE = './dragon_stand.ini'
     GT_PATH = '../data/bunny/gt_rand.csv'
-    data_list = ['bun000', 'bun045', 'bun090', 'bun180', 'bun270', 'bun315', 
-                'chin', 'ear_back', 'top2', 'top3']
+    data_list = ['bun000',   # 0
+                 'bun045',   # 1
+                 'bun090',   # 2
+                 'bun180',   # 3
+                 'bun270',   # 4
+                 'bun315',   # 5
+                 'chin',     # 6
+                 'ear_back', # 7
+                 'top2',     # 8
+                 'top3']     # 9
     num_pair = 30
     success_threshold = 0.3
 
-    target_idx = 0
-    source_idx = 2
-
-    gt_map = load_groundtruth_partial(GT_PATH, data_list)
-    reg_mat, reg_mat_inv = run_rigid_batch(DATA_PATH, data_list[target_idx], 
-        data_list[source_idx], CONFIG_FILE, num_pair=num_pair)
-    gt_mat = gt_map[data_list[source_idx]]
+    data_pair = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 0),
+                 (0, 6), (6, 5), (0, 9), (1, 9), (2, 9), (2, 7),
+                 (8, 7), (8, 3), (8, 2), (8, 9), (3, 7)]
     
-    total_error = 0
-    success = 0
-    for i in range(num_pair):
-        reg_mat_i = reg_mat[i][:3, :3]
-        gt_mat_i = gt_mat[:3, (4*i):(4*i+3)]
-        error = matrix_frobenius_norm(reg_mat_i, gt_mat_i)
-        if error < success_threshold:
-            success += 1
-            total_error += error
-    print("Success rate: {}/{}".format(success, num_pair))
-    print("Average error: {}".format(total_error / success))
+    result = {}
+    result_txt = '../data/bunny/result_1101.txt'
+
+    for pair in data_pair:
+        target_idx = pair[0]
+        source_idx = pair[1]
+
+        gt_map = load_groundtruth_partial(GT_PATH, data_list)
+        reg_mat, reg_mat_inv = run_rigid_batch(DATA_PATH, data_list[target_idx], 
+            data_list[source_idx], CONFIG_FILE, num_pair=num_pair)
+        gt_mat = gt_map[data_list[source_idx]]
+        
+        total_error = 0
+        success = 0
+        for i in range(num_pair):
+            reg_mat_i = reg_mat[i][:3, :3]
+            gt_mat_i = gt_mat[:3, (4*i):(4*i+3)]
+            error = matrix_frobenius_norm(reg_mat_i, gt_mat_i)
+            if error < success_threshold:
+                success += 1
+                total_error += error
+        success_rate = success / num_pair
+        average_err  = total_error / success
+        result[(target_idx, source_idx)] = (success_rate, average_err)
+        print("Success rate: {}/{}".format(success, num_pair))
+        print("Average error: {}".format(total_error / success))
+    
+    for pair in result:
+        succ_rate, avg_err = result[pair]
+        print("{}->{}: {}, {}".format(data_list[pair[0]], data_list[pair[1]], succ_rate, avg_err))
+
+    
         
 
